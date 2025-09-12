@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Cool Extension Icons</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            max-width: 800px; 
+            margin: 20px auto; 
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        h1 { 
+            color: #667eea; 
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin: 30px 0;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .upload-area:hover {
+            border-color: #5a67d8;
+            background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
+            transform: translateY(-2px);
+        }
+        .upload-area.dragover {
+            border-color: #38b2ac;
+            background: linear-gradient(135deg, #e6fffa 0%, #4fd1c7 30%);
+            transform: scale(1.02);
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .upload-text {
+            font-size: 1.2em;
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+        .file-info {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+        button { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border: none; 
+            padding: 15px 30px; 
+            border-radius: 10px; 
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .preview {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 2px solid #e2e8f0;
+        }
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+        .icon-item {
+            text-align: center;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .icon-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .icon-display {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+        .icon-size {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .download-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            padding: 10px 20px;
+            font-size: 14px;
+            box-shadow: 0 3px 10px rgba(72, 187, 120, 0.3);
+        }
+        .download-btn:hover {
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+        .success { 
+            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+            color: #22543d; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin: 20px 0;
+            border-left: 4px solid #38a169;
+            font-weight: 500;
+        }
+        .instructions {
+            background: linear-gradient(135deg, #bee3f8 0%, #90cdf4 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border-left: 4px solid #4299e1;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: 600;
+        }
+        canvas { 
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+        }
+        .original-preview {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .original-img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Create Cool Extension Icons</h1>
+        
+        <div class="upload-area" onclick="document.getElementById('fileInput').click()" 
+             ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+            <div class="upload-text">
+                <strong>Drop your ExplainWithGemini.avif file here</strong><br>
+                or click to browse
+            </div>
+            <input type="file" id="fileInput" accept=".avif,image/*" onchange="handleFile(event)">
+        </div>
+        
+        <div id="fileInfo" class="file-info" style="display: none;"></div>
+        <div id="originalPreview" class="original-preview" style="display: none;"></div>
+        
+        <button id="convertBtn" onclick="convertIcons()" disabled>
+            🚀 Create Cool Icons
+        </button>
+        
+        <div id="preview" class="preview" style="display: none;">
+            <h3 style="text-align: center; color: #4a5568; margin-bottom: 20px;">
+                🎯 Your Cool Extension Icons
+            </h3>
+            <div class="icon-grid" id="iconGrid"></div>
+        </div>
+        
+        <div id="result"></div>
+        
+        <div class="instructions">
+            <h3 style="color: #2b6cb0; margin-bottom: 20px;">📋 How to Install Your Cool Icons:</h3>
+            <div class="step">
+                <div class="step-number">1</div>
+                <div>Upload your <code>ExplainWithGemini.avif</code> file above</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div>Click "Create Cool Icons" to generate PNG versions</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div>Download all three icon sizes (16px, 48px, 128px)</div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div>Replace the files in your <code>assets/</code> folder</div>
+            </div>
+            <div class="step">
+                <div class="step-number">5</div>
+                <div>Reload the extension in Chrome and enjoy your cool icon! 🎉</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+        
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('dragover');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+        
+        function handleFile(e) {
+            const file = e.target.files[0];
+            if (file) {
+                processFile(file);
+            }
+        }
+        
+        function processFile(file) {
+            selectedFile = file;
+            
+            // Show file info
+            const fileInfo = document.getElementById('fileInfo');
+            fileInfo.innerHTML = `
+                <strong>📁 File:</strong> ${file.name}<br>
+                <strong>💾 Size:</strong> ${(file.size / 1024).toFixed(1)} KB<br>
+                <strong>🎨 Type:</strong> ${file.type || 'AVIF Image'}
+            `;
+            fileInfo.style.display = 'block';
+            
+            // Show original preview
+            const originalPreview = document.getElementById('originalPreview');
+            const img = document.createElement('img');
+            img.className = 'original-img';
+            img.onload = function() {
+                originalPreview.innerHTML = `
+                    <h4 style="color: #4a5568; margin-bottom: 15px;">Original Icon Preview:</h4>
+                `;
+                originalPreview.appendChild(img);
+                originalPreview.style.display = 'block';
+                URL.revokeObjectURL(img.src);
+            };
+            img.src = URL.createObjectURL(file);
+            
+            // Enable convert button
+            document.getElementById('convertBtn').disabled = false;
+        }
+        
+        async function convertIcons() {
+            if (!selectedFile) {
+                alert('Please select a file first');
+                return;
+            }
+            
+            const preview = document.getElementById('preview');
+            const iconGrid = document.getElementById('iconGrid');
+            const result = document.getElementById('result');
+            const convertBtn = document.getElementById('convertBtn');
+            
+            try {
+                convertBtn.disabled = true;
+                convertBtn.innerHTML = '⏳ Creating icons...';
+                
+                // Create image from file
+                const img = new Image();
+                const imageUrl = URL.createObjectURL(selectedFile);
+                
+                img.onload = function() {
+                    // Clear previous results
+                    iconGrid.innerHTML = '';
+                    
+                    const sizes = [
+                        { size: 16, name: 'Toolbar Icon', desc: 'Small toolbar display' },
+                        { size: 48, name: 'Extension Menu', desc: 'Extension management page' },
+                        { size: 128, name: 'Chrome Store', desc: 'High resolution display' }
+                    ];
+                    
+                    sizes.forEach(({ size, name, desc }) => {
+                        // Create high-quality canvas
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        canvas.width = size;
+                        canvas.height = size;
+                        
+                        // Enable image smoothing for high quality
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        
+                        // Draw resized image
+                        ctx.drawImage(img, 0, 0, size, size);
+                        
+                        // Create preview display
+                        const iconItem = document.createElement('div');
+                        iconItem.className = 'icon-item';
+                        
+                        const displayCanvas = document.createElement('canvas');
+                        displayCanvas.width = size;
+                        displayCanvas.height = size;
+                        displayCanvas.style.width = `${Math.min(size * 2, 64)}px`;
+                        displayCanvas.style.height = `${Math.min(size * 2, 64)}px`;
+                        const displayCtx = displayCanvas.getContext('2d');
+                        displayCtx.imageSmoothingEnabled = false; // Keep crisp for preview
+                        displayCtx.drawImage(canvas, 0, 0);
+                        
+                        iconItem.innerHTML = `
+                            <div class="icon-display"></div>
+                            <div class="icon-size">${size}×${size}px</div>
+                            <div style="color: #718096; margin-bottom: 15px; font-size: 0.9em;">
+                                <strong>${name}</strong><br>${desc}
+                            </div>
+                            <button class="download-btn" onclick="downloadIcon('${canvas.toDataURL('image/png', 1.0)}', 'icon${size}.png')">
+                                📥 Download PNG
+                            </button>
+                        `;
+                        
+                        // Add canvas to display area
+                        const displayArea = iconItem.querySelector('.icon-display');
+                        displayArea.appendChild(displayCanvas);
+                        
+                        iconGrid.appendChild(iconItem);
+                    });
+                    
+                    preview.style.display = 'block';
+                    
+                    result.innerHTML = `
+                        <div class="success">
+                            🎉 <strong>Cool icons created successfully!</strong><br><br>
+                            Your custom <code>ExplainWithGemini.avif</code> has been converted to high-quality PNG icons.<br>
+                            Download each size and replace the files in your <code>assets/</code> folder.<br><br>
+                            <strong>Pro tip:</strong> The icons are optimized for crisp display at each size! 🔥
+                        </div>
+                    `;
+                    
+                    convertBtn.innerHTML = '✅ Icons Created!';
+                    setTimeout(() => {
+                        convertBtn.innerHTML = '🚀 Create Cool Icons';
+                        convertBtn.disabled = false;
+                    }, 3000);
+                    
+                    URL.revokeObjectURL(imageUrl);
+                };
+                
+                img.onerror = function() {
+                    result.innerHTML = `
+                        <div style="background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%); color: #c53030; padding: 20px; border-radius: 12px; border-left: 4px solid #e53e3e;">
+                            ❌ <strong>Error:</strong> Could not load the image file. Make sure it's a valid AVIF or image file.
+                        </div>
+                    `;
+                    convertBtn.innerHTML = '🚀 Create Cool Icons';
+                    convertBtn.disabled = false;
+                };
+                
+                img.src = imageUrl;
+                
+            } catch (error) {
+                result.innerHTML = `
+                    <div style="background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%); color: #c53030; padding: 20px; border-radius: 12px; border-left: 4px solid #e53e3e;">
+                        ❌ <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+                convertBtn.innerHTML = '🚀 Create Cool Icons';
+                convertBtn.disabled = false;
+            }
+        }
+        
+        function downloadIcon(dataUrl, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = dataUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show download feedback
+            const event = new CustomEvent('iconDownloaded', { detail: filename });
+            document.dispatchEvent(event);
+        }
+        
+        // Add download feedback
+        document.addEventListener('iconDownloaded', function(e) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed; top: 20px; right: 20px; z-index: 1000;
+                background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+                color: white; padding: 15px 20px; border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+                font-weight: 600; animation: slideIn 0.3s ease;
+            `;
+            notification.innerHTML = `✅ Downloaded ${e.detail}`;
+            
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease forwards';
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 2000);
+        });
+        
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

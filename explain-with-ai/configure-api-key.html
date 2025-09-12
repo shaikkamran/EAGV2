@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Configure Explain with Gemini</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 600px; 
+            margin: 50px auto; 
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #1a73e8; }
+        button { 
+            background: #1a73e8; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 6px; 
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background: #1557b0; }
+        .success { 
+            background: #e6f4ea; 
+            color: #137333; 
+            padding: 15px; 
+            border-radius: 6px; 
+            margin-top: 20px;
+        }
+        .error { 
+            background: #fce8e6; 
+            color: #d33b2c; 
+            padding: 15px; 
+            border-radius: 6px; 
+            margin-top: 20px;
+        }
+        .instructions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-left: 4px solid #1a73e8;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Configure ExplainWithAi Extension</h1>
+        
+        <div class="instructions">
+            <h3>Setup Instructions:</h3>
+            <ol>
+                <li>Make sure the extension is loaded in Chrome</li>
+                <li>Click the button below to configure your API key</li>
+                <li>The extension will be ready to use!</li>
+            </ol>
+        </div>
+
+        <button onclick="configureExtension()">
+            🔧 Configure Extension with API Key
+        </button>
+        
+        <div id="result"></div>
+        
+        <div class="instructions" style="margin-top: 30px;">
+            <h3>How to Use:</h3>
+            <ul>
+                <li><strong>Select text</strong> on any webpage and right-click → "Explain with AI"</li>
+                <li>Use keyboard shortcut: <strong>Ctrl+Shift+E</strong> (Windows/Linux) or <strong>Cmd+Shift+E</strong> (Mac)</li>
+                <li>Click the extension icon to open the popup interface</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        async function configureExtension() {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                // Configure the extension with the API key and settings
+                const settings = {
+                    geminiApiKey: 'AIzaSyA6rrurtkWUemALCySiotDSwI61EAKyTK4',
+                    model: 'gemini-2.5-flash',
+                    preset: 'Plain',
+                    safetyLevel: 'BLOCK_MEDIUM_AND_ABOVE'
+                };
+                
+                await chrome.storage.sync.set(settings);
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        ✅ <strong>Extension configured successfully!</strong><br>
+                        <br>
+                        <strong>Settings applied:</strong><br>
+                        • API Key: ${settings.geminiApiKey.substring(0, 20)}...<br>
+                        • Model: ${settings.model}<br>
+                        • Style: ${settings.preset}<br>
+                        • Safety: ${settings.safetyLevel}<br>
+                        <br>
+                        🎉 Your extension is now ready to use!
+                    </div>
+                `;
+                
+                // Test the API connection
+                setTimeout(async () => {
+                    try {
+                        const response = await chrome.runtime.sendMessage({
+                            type: 'TEST_API',
+                            apiKey: settings.geminiApiKey,
+                            model: settings.model
+                        });
+                        
+                        if (response.success) {
+                            resultDiv.innerHTML += `
+                                <div class="success" style="margin-top: 10px;">
+                                    🌟 <strong>API connection test successful!</strong><br>
+                                    The extension is working perfectly.
+                                </div>
+                            `;
+                        } else {
+                            resultDiv.innerHTML += `
+                                <div class="error" style="margin-top: 10px;">
+                                    ⚠️ <strong>API test failed:</strong> ${response.error}<br>
+                                    But settings were saved. Try using the extension anyway.
+                                </div>
+                            `;
+                        }
+                    } catch (error) {
+                        console.log('API test not available yet, but settings saved successfully');
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        ❌ <strong>Error configuring extension:</strong><br>
+                        ${error.message}<br>
+                        <br>
+                        Make sure the extension is loaded in Chrome and try again.
+                    </div>
+                `;
+                console.error('Configuration error:', error);
+            }
+        }
+    </script>
+</body>
+</html>
