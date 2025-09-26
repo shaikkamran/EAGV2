@@ -1,44 +1,110 @@
+"""
+AI-Powered Email Orchestration System
 
-from email import message
-from google import genai
+This module provides the main orchestration logic for multi-step email operations
+using Google's Gemini AI. It handles workflow management, prompt generation,
+and task execution coordination.
+
+Author: AI Assistant
+Date: September 2025
+"""
+
 import os
-from dotenv import load_dotenv
-from datetime import datetime
-from main import create_gmail_client
-import re,json
+import re
+import json
 import gc
 import atexit
+from typing import List, Dict, Optional
+from datetime import datetime
+
+from google import genai
+from dotenv import load_dotenv
+from main import create_gmail_client
+from email_analyzer import analyze_emails_for_intent
 
 load_dotenv()
-# read the api key from the environment variable
+
+
+# ==================== GLOBAL CONFIGURATION ====================
+
+# Load API key and initialize clients
 api_key = os.getenv("GEMINI_API_KEY")
+if not api_key:
+    raise ValueError("GEMINI_API_KEY environment variable is required")
+
 client = genai.Client(api_key=api_key)
 gmail_client = create_gmail_client()
 
-# Function to clean up resources properly
-def cleanup_resources():
-    global client, gmail_client
-    try:
-        client = None
-        gmail_client = None
-        gc.collect()  # Force garbage collection
-    except:
-        pass
 
-# Register cleanup function to run on exit
-atexit.register(cleanup_resources)
+# ==================== UTILITY FUNCTIONS ====================
 
-
-# write a function to get the current date and time
 def get_current_date_and_time():
+    """Get current date and time as formatted string."""
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+
 def convert_given_time_into_days_ago(given_time):
+    """Convert given time to days ago from now."""
     return (datetime.now() - given_time).days
 
-# Help me Write a prompt that reads emails given time period by user by using the functionality from the main.py file that is the Gmail Client
+
+def parse_llm_response(response):
+    """Parse LLM response to extract JSON object with robust error handling."""
+    try:
+        # Try to extract JSON from markdown code block
+        json_object = re.search(r"```json\n(.*?)\n```", response, re.DOTALL)
+        if json_object:
+            json_str = json_object.group(1)
+            parsed_response = json.loads(json_str)
+            return parsed_response
+            
+        # Fallback: Try to find JSON object directly
+        json_match = re.search(r'\{.*?\}', response, re.DOTALL)
+        if json_match:
+            json_str = json_match.group(0)
+            parsed_response = json.loads(json_str)
+            return parsed_response
+            
+        print("❌ No valid JSON found in response")
+        return None
+        
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON parsing error: {e}")
+        print(f"🔍 Problematic response snippet: {response[:200]}...")
+        
+        # Try to fix common JSON issues
+        try:
+            if json_object:
+                json_str = json_object.group(1)
+                # Fix common escape issues
+                json_str = json_str.replace('\\', '\\\\')  # Escape backslashes
+                json_str = json_str.replace('\n', '\\n')   # Escape newlines
+                json_str = json_str.replace('\t', '\\t')   # Escape tabs
+                parsed_response = json.loads(json_str)
+                print("✅ Fixed JSON parsing with escape handling")
+                return parsed_response
+        except:
+            pass
+            
+        return None
+    except Exception as e:
+        print(f"❌ Unexpected parsing error: {e}")
+        return None
+
+
+# ==================== ORCHESTRATION PROMPT SYSTEM ====================
 
 def create_prompt(previous_results=None, next_steps=None):
+    """
+    Create the main orchestration prompt for multi-step email workflows.
+    
+    Args:
+        previous_results: Results from previous step execution
+        next_steps: Next steps to be executed
+        
+    Returns:
+        Formatted prompt string for Gemini AI
+    """
     base_prompt = """
 You are an AI assistant that can solve tasks by calling specific tools in a multi-step workflow.
 You must ONLY respond with a single JSON object in the format:
@@ -46,6 +112,14 @@ You must ONLY respond with a single JSON object in the format:
 ```json
 {"function_name": "<tool_name>", "parameters": {<arguments>}, "next_steps": "", "workflow_complete": false}
 ```
+
+CRITICAL JSON FORMATTING RULES:
+- Use double quotes for all strings
+- Do NOT include any backslashes, newlines, or special characters in JSON values
+- Keep parameter values simple and clean (strings, numbers, booleans only)
+- Do NOT include any text outside the JSON object
+- Do NOT pass complex objects like email lists as parameters - they are handled automatically
+- Only pass simple string/number parameters as documented
 
 ---
 
@@ -72,12 +146,13 @@ You must ONLY respond with a single JSON object in the format:
        - thread_ids (list[str], optional): List of thread IDs (applies to all emails in the thread).
    - **Returns:** OperationResult object with details.
 
-3. **Analyze Email Content for SPAM**
-   - **Name:** analyze_emails_for_spam
-   - **Description:** Analyze email content to determine if emails should be labeled as SPAM. Uses previously retrieved emails automatically.
+3. **Universal AI-Powered Intent Analysis**
+   - **Name:** analyze_emails_for_intent
+   - **Description:** Use advanced AI reasoning to analyze email content for ANY specified intent without restrictions. The AI dynamically understands and classifies emails based on your intent description. Examples: "SPAM", "URGENT", "AMAZON ORDERS", "CUSTOMER COMPLAINTS", "WORK MEETINGS", "BIRTHDAY INVITATIONS", etc. This function automatically uses emails from previous steps - DO NOT pass emails as parameters.
    - **Parameters:**
-       - spam_keywords (list, optional): List of keywords that indicate SPAM.
-   - **Returns:** List of thread_ids that should be labeled as SPAM.
+       -emails (list[EmailSummary]): List of EmailSummary strings to analyze.
+       - intent (str): ANY intent description you want to analyze for - completely flexible and unrestricted.
+   - **Returns:** List of thread_ids that match the specified intent, with automatic labeling applied.
 
 ---
 
@@ -94,8 +169,12 @@ You must ONLY respond with a single JSON object in the format:
 
 ### Important Notes:
 - For "month of Feb 2025" requests, this is a future date, so use a reasonable days_ago value like 30-60 days to capture a month's worth of emails
-- Always include a reasonable count parameter for email reading (suggest 50-100 for monthly requests)
-- When analyzing for SPAM, look for suspicious patterns, promotional content, unknown senders, etc.
+- Always include a reasonable count parameter for email reading (suggest 50-100 for monthly requests)  
+- The intent analysis system is COMPLETELY UNIVERSAL - it can understand and analyze for ANY intent the user specifies
+- Examples of intents: "SPAM", "URGENT", "AMAZON ORDERS", "CUSTOMER COMPLAINTS", "WORK MEETINGS", "BIRTHDAY INVITATIONS", "CRYPTOCURRENCY NEWS", etc.
+- The AI uses sophisticated semantic understanding, contextual analysis, and pattern recognition for ANY intent
+- Labels are automatically created and applied based on the intent name (spaces become underscores)
+- The system dynamically adapts to new intents without requiring predefined configurations
 """
     
     if previous_results is not None:
@@ -114,172 +193,211 @@ Based on the previous results and next steps, determine what action to take next
     return base_prompt
 
 
-# Create properly formatted contents for Gemini API
-user_message = "Read the top 10 emails from the month of Feb 2025 and label them as SPAM if the content of the email is related to the topic of SPAM"
+# ==================== WORKFLOW EXECUTION ENGINE ====================
 
-max_attempts = 5
-workflow_complete = False
-previous_results = None
-next_steps = None
-step_number = 1
-email_data_store = {}  # Store email data between steps
-
-def parse_llm_response(response):
-
-    # Get the json object that is present within the ```json``` blocks
-    json_object = re.search(r"```json\n(.*?)\n```", response, re.DOTALL)
-    if json_object:
-        parsed_response = json.loads(json_object.group(1))
-    else:
-        parsed_response = None
-
-    return parsed_response
-
-# SPAM analysis function
-def analyze_emails_for_spam(emails, spam_keywords=None):
-    """Analyze emails for SPAM content and return thread_ids that should be labeled as SPAM."""
-    if spam_keywords is None:
-        spam_keywords = [
-            'win', 'winner', 'prize', 'congratulations', 'free', 'click here', 
-            'urgent', 'limited time', 'act now', 'offer', 'deal', 'discount',
-            'lottery', 'million', 'inheritance', 'prince', 'nigeria',
-            'viagra', 'casino', 'poker', 'loan', 'credit', 'debt',
-            'weight loss', 'diet pill', 'supplements', 'enhancement'
-        ]
-    
-    spam_thread_ids = []
-    
-    for email in emails:
-        content_to_check = (email.subject + " " + email.sender + " " + email.content_preview).lower()
-        
-        # Check for SPAM indicators
-        spam_score = 0
-        
-        # Check for SPAM keywords
-        for keyword in spam_keywords:
-            if keyword.lower() in content_to_check:
-                spam_score += 1
-        
-        # Check for suspicious patterns
-        if 'urgent' in content_to_check or 'act now' in content_to_check:
-            spam_score += 2
-        
-        if any(char in email.sender for char in ['noreply', 'no-reply']):
-            spam_score += 1
-            
-        # Check for promotional content patterns
-        if 'deal' in content_to_check and ('save' in content_to_check or '%' in content_to_check):
-            spam_score += 2
-            
-        # Suspicious subject patterns
-        if any(word in email.subject.lower() for word in ['re:', 'fwd:', 'urgent', 'important']):
-            if not any(word in email.subject.lower() for word in ['payment', 'account', 'security']):
-                spam_score += 1
-        
-        # If spam score is high enough, mark as SPAM
-        if spam_score >= 2:
-            spam_thread_ids.append(email.thread_id)
-            print(f"🚨 SPAM detected: {email.subject} (Score: {spam_score})")
-    
-    print(f"📊 Analyzed {len(emails)} emails, found {len(spam_thread_ids)} potential SPAM emails")
-    return spam_thread_ids
-
-# Now write code which is given in the parsed response using the gmail_client
 def execute_llm_response(parsed_response, email_data_store):
-    if parsed_response["function_name"] == "read_emails_by_time_period":
-        result = gmail_client.read_emails_by_time_period(**parsed_response["parameters"])
+    """
+    Execute the function specified in the LLM response.
+    
+    Args:
+        parsed_response: Parsed JSON response from LLM
+        email_data_store: Dictionary to store data between workflow steps
+        
+    Returns:
+        Result of the executed function
+    """
+    function_name = parsed_response.get("function_name")
+    parameters = parsed_response.get("parameters", {})
+    
+    if function_name == "read_emails_by_time_period":
+        result = gmail_client.read_emails_by_time_period(**parameters)
         # Store emails in data store for later use
         email_data_store['emails'] = result
+        
+        # Debug: Confirm storage
+        print(f"🔍 Email Storage Debug:")
+        print(f"  - Storing {len(result) if result else 0} emails in data store")
+        if result:
+            print(f"  - Sample stored email subjects: {[e.subject[:50] for e in result[:3]]}")
+        print()
+        
         return result
     
-    elif parsed_response["function_name"] == "apply_label_to_emails":
-        return gmail_client.apply_label_to_emails(**parsed_response["parameters"])
+    elif function_name == "apply_label_to_emails":
+        return gmail_client.apply_label_to_emails(**parameters)
     
-    elif parsed_response["function_name"] == "analyze_emails_for_spam":
-        # Use the stored emails instead of trying to parse from string
+    elif function_name == "analyze_emails_for_intent":
+        # Use the stored emails for intent analysis
         emails = email_data_store.get('emails', [])
-        spam_keywords = parsed_response["parameters"].get("spam_keywords", None)
-        result = analyze_emails_for_spam(emails, spam_keywords)
-        # Store spam thread IDs for later labeling
-        email_data_store['spam_thread_ids'] = result
+        intent = parameters.get("intent", "SPAM")
+        
+        # Debug: Check what emails we have
+        print(f"🔍 Email Data Store Debug:")
+        print(f"  - Data store keys: {list(email_data_store.keys())}")
+        print(f"  - Number of emails retrieved: {len(emails)}")
+        if emails:
+            print(f"  - Sample email subjects: {[e.subject[:50] for e in emails[:3]]}")
+        else:
+            print(f"  - ❌ No emails found in data store!")
+        print()
+        
+        result = analyze_emails_for_intent(emails, intent, gmail_client, api_key)
+        # Store classified thread IDs for later use
+        email_data_store[f'{intent.lower()}_thread_ids'] = result
         return result
     
-    elif parsed_response["function_name"] == "none":
+    elif function_name == "none":
         return None
     
     else:
+        print(f"❌ Unknown function: {function_name}")
         return None
 
 
-try:
-    print(f"🚀 Starting multi-step workflow for: {user_message}")
-    print("="*80)
+# ==================== MAIN ORCHESTRATION WORKFLOW ====================
+
+def run_email_workflow(user_message: str, max_attempts: int = 5):
+    """
+    Run the main email orchestration workflow.
     
-    for attempt in range(max_attempts):
-        if workflow_complete:
-            print("✅ Workflow completed successfully!")
-            break
+    Args:
+        user_message: User's request to process
+        max_attempts: Maximum number of workflow steps to attempt
+        
+    Returns:
+        Dictionary with workflow results and status
+    """
+    print(f"🚀 Starting email workflow for: {user_message}")
+    print("=" * 80)
+    
+    workflow_complete = False
+    previous_results = None
+    next_steps = None
+    step_number = 1
+    email_data_store = {}  # Store email data between steps
+    workflow_results = []
+    
+    try:
+        for attempt in range(max_attempts):
+            if workflow_complete:
+                print("✅ Workflow completed successfully!")
+                break
+                
+            print(f"\n📋 STEP {step_number}: Planning next action...")
             
-        print(f"\n📋 STEP {step_number}: Planning next action...")
-        
-        # Create dynamic prompt based on current state
-        current_prompt = create_prompt(previous_results, next_steps)
-        current_prompt = f"You took the current date and time as {get_current_date_and_time()}\n" + current_prompt
-        
-        # Format according to new Gemini API structure
-        if step_number == 1:
-            # First step - just the user message
-            prompt_text = f"{current_prompt}\n\nUser request: {user_message}"
-        else:
-            # Subsequent steps - include previous context
-            prompt_text = f"{current_prompt}\n\nOriginal user request: {user_message}\nContinue with the next step to complete this request."
-        
-        contents = [
-            {
-                "parts": [
-                    {"text": prompt_text}
-                ]
+            # Create dynamic prompt based on current state
+            current_prompt = create_prompt(previous_results, next_steps)
+            current_prompt = f"You took the current date and time as {get_current_date_and_time()}\n" + current_prompt
+            
+            # Format according to Gemini API structure
+            if step_number == 1:
+                prompt_text = f"{current_prompt}\n\nUser request: {user_message}"
+            else:
+                prompt_text = f"{current_prompt}\n\nOriginal user request: {user_message}\nContinue with the next step to complete this request."
+            
+            contents = [{"parts": [{"text": prompt_text}]}]
+            
+            print(f"🤖 Sending request to Gemini AI...")
+            
+            # Call Gemini API
+            response = client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents=contents,
+            )
+            
+            # Parse LLM response
+            parsed_response = parse_llm_response(response.text)
+            print(f"📥 Parsed Response: {parsed_response}")
+            
+            if not parsed_response:
+                print("❌ Failed to parse LLM response")
+                break
+            
+            # Execute the function
+            function_name = parsed_response.get('function_name', 'unknown')
+            print(f"⚡ Executing: {function_name}")
+            execution_result = execute_llm_response(parsed_response, email_data_store)
+            
+            # Store step results
+            step_result = {
+                "step": step_number,
+                "function": function_name,
+                "parameters": parsed_response.get("parameters", {}),
+                "result": execution_result,
+                "success": execution_result is not None
             }
-        ]
-
-        print(f"🤖 Sending request to Gemini API... {prompt_text}\n\n======")
-
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=contents,
-        )
-        
-        parsed_response = parse_llm_response(response.text)
-        print(f"📥 Parsed Response: {parsed_response}")
-        
-        if not parsed_response:
-            print("❌ Failed to parse LLM response")
-            break
-        
-        # Execute the function
-        print(f"⚡ Executing: {parsed_response['function_name']}")
-        execution_result = execute_llm_response(parsed_response, email_data_store)
-        
-        # Update state for next iteration
-        previous_results = execution_result
-        next_steps = parsed_response.get("next_steps", "")
-        workflow_complete = parsed_response.get("workflow_complete", False)
-        step_number += 1
-        
-        print(f"📊 Step {step_number-1} Results: {type(execution_result)} with {len(execution_result) if hasattr(execution_result, '__len__') else 'N/A'} items")
-        
-        if workflow_complete:
-            print("✅ Workflow marked as complete by LLM")
-            break
+            workflow_results.append(step_result)
             
-        print(f"➡️ Next steps: {next_steps}")
-        print("-"*60)
+            # Update state for next iteration
+            previous_results = execution_result
+            next_steps = parsed_response.get("next_steps", "")
+            workflow_complete = parsed_response.get("workflow_complete", False)
+            step_number += 1
+            
+            print(f"📊 Step {step_number-1} Results: {type(execution_result)} with {len(execution_result) if hasattr(execution_result, '__len__') else 'N/A'} items")
+            
+            if workflow_complete:
+                print("✅ Workflow marked as complete by LLM")
+                break
+                
+            print(f"➡️ Next steps: {next_steps}")
+            print("-" * 60)
+        
+        return {
+            "success": workflow_complete,
+            "steps_executed": len(workflow_results),
+            "results": workflow_results,
+            "email_data": email_data_store,
+            "message": "Workflow completed successfully" if workflow_complete else "Workflow incomplete"
+        }
+        
+    except Exception as e:
+        print(f"❌ Workflow failed: {e}")
+        return {
+            "success": False,
+            "steps_executed": len(workflow_results),
+            "results": workflow_results,
+            "email_data": email_data_store,
+            "error": str(e),
+            "message": f"Workflow failed: {e}"
+        }
 
-finally:
-    # Prevent cleanup errors by removing client reference
+
+# ==================== RESOURCE CLEANUP ====================
+
+def cleanup_resources():
+    """Clean up resources properly."""
+    global client, gmail_client
     try:
         client = None
+        gmail_client = None
         gc.collect()
     except:
-        pass  # Ignore any errors during cleanup
+        pass
 
+# Register cleanup function
+atexit.register(cleanup_resources)
+
+
+# ==================== MAIN EXECUTION ====================
+
+if __name__ == "__main__":
+    # Example workflow execution
+    user_message = "Read the top 10 emails from 3 days and analyze them for ECOMMERCE AMAZON intent, then automatically label them"
+    
+    try:
+        result = run_email_workflow(user_message)
+        
+        print("\n" + "=" * 80)
+        print("📊 WORKFLOW SUMMARY")
+        print("=" * 80)
+        print(f"✅ Success: {result['success']}")
+        print(f"📋 Steps Executed: {result['steps_executed']}")
+        print(f"💬 Message: {result['message']}")
+        
+        if result.get('email_data'):
+            print(f"📧 Email Data Available: {list(result['email_data'].keys())}")
+        
+    finally:
+        # Clean up resources
+        cleanup_resources()
