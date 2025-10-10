@@ -6,7 +6,7 @@ import asyncio
 from google import genai
 from concurrent.futures import TimeoutError
 from functools import partial
-from utils import get_tools_description, parse_llm_response
+from utils import get_tools_description, parse_llm_response, generate_with_timeout
 from pydantic import BaseModel
 
 # Load environment variables from .env file
@@ -17,7 +17,6 @@ api_key = os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 
 max_iterations = 10  # Increased to allow for drawing operations
-last_response = None
 iteration = 0
 response_history = {}
 
@@ -30,38 +29,12 @@ class Response(BaseModel):
     workflow_complete: bool
     
 
-async def generate_with_timeout(client, prompt, timeout=10):
-    """Generate content with a timeout"""
-    print("Starting LLM generation...")
-    try:
-        # Convert the synchronous generate_content call to run in a thread
-        loop = asyncio.get_event_loop()
-        response = await asyncio.wait_for(
-            loop.run_in_executor(
-                None, 
-                lambda: client.models.generate_content(
-                    model="gemini-2.0-flash",
-                    contents=prompt
-                )
-            ),
-            timeout=timeout
-        )
-        print("LLM generation completed")
-        return response
-    except TimeoutError:
-        print("LLM generation timed out!")
-        raise
-    except Exception as e:
-        print(f"Error in LLM generation: {e}")
-        raise
 
 def reset_state():
     """Reset all global variables to their initial state"""
-    global last_response, response_history
+    global iteration,response_history
     iteration = 0
     response_history = {}
-
-
 
 
 async def main():
