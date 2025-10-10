@@ -56,7 +56,7 @@ def get_tools_description(tools):
         return tools_description
 
 
-async def generate_with_timeout(client, prompt, timeout=10):
+async def generate_with_timeout(client, prompt, timeout=20):
     """Generate content with a timeout"""
     print("Starting LLM generation...")
     try:

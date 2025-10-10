@@ -169,7 +169,7 @@ async def open_preview_with_pdf() -> dict:
         # Create a unique filename for this session
         import uuid
         unique_id = str(uuid.uuid4())[:8]
-        current_pdf_path = f"/Users/kamran/Documents/EAGV2/EAGV2/session4/preview_results/drawing_{unique_id}.pdf"
+        current_pdf_path = f"/Users/kamran/Documents/EAGV2/session5/preview_results/drawing_{unique_id}.pdf"
         
         # Reset elements list
         pdf_elements = []
