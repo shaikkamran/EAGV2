@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExplainWithAi - Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="title">
+        <img src="../assets/icon48.png" alt="AI" class="icon">
+        ExplainWithAi Settings
+      </h1>
+      <p class="subtitle">Configure your Gemini API settings and preferences</p>
+    </header>
+
+    <main class="main">
+      <!-- API Configuration -->
+      <section class="section">
+        <h2 class="section-title">API Configuration</h2>
+        
+        <div class="field">
+          <label for="apiKey" class="label">
+            Gemini API Key
+            <span class="required">*</span>
+          </label>
+          <div class="input-group">
+            <input 
+              type="password" 
+              id="apiKey" 
+              class="input" 
+              placeholder="Enter your Gemini API key"
+              autocomplete="off"
+            >
+            <button type="button" id="toggleKey" class="toggle-btn" title="Show/Hide API Key">
+              👁️
+            </button>
+          </div>
+          <div class="field-help">
+            Get your free API key from 
+            <a href="https://ai.google.dev" target="_blank" rel="noopener">ai.google.dev</a>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="model" class="label">Default Model</label>
+          <select id="model" class="select">
+            <option value="gemini-2.5-flash">Gemini 2.5 Flash (Recommended)</option>
+            <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+            <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+          </select>
+          <div class="field-help">
+            Model names follow the pattern: gemini-[generation]-[variation]. 
+            Flash models are faster, Pro models are more capable.
+          </div>
+        </div>
+
+        <div class="test-section">
+          <button type="button" id="testBtn" class="test-btn">
+            <span class="btn-text">Test API Connection</span>
+            <div class="spinner" id="testSpinner"></div>
+          </button>
+          <div class="test-result" id="testResult"></div>
+        </div>
+      </section>
+
+      <!-- Default Preferences -->
+      <section class="section">
+        <h2 class="section-title">Default Preferences</h2>
+        
+        <div class="field">
+          <label for="preset" class="label">Default Explanation Style</label>
+          <select id="preset" class="select">
+            <option value="Plain">Plain explanation</option>
+            <option value="ELI5">Explain like I'm 5</option>
+            <option value="Key points">Key points summary</option>
+          </select>
+          <div class="field-help">
+            Choose the default style for explanations. You can change this in the popup.
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="safetyLevel" class="label">Safety Level</label>
+          <select id="safetyLevel" class="select">
+            <option value="BLOCK_MEDIUM_AND_ABOVE">Default (Block medium+ harmful content)</option>
+            <option value="BLOCK_ONLY_HIGH">Relaxed (Block only high harmful content)</option>
+            <option value="BLOCK_NONE">Off (No content filtering)</option>
+          </select>
+          <div class="field-help">
+            Controls how strictly harmful content is filtered. Use "Off" only for development.
+          </div>
+        </div>
+      </section>
+
+      <!-- Usage & Privacy -->
+      <section class="section">
+        <h2 class="section-title">Usage & Privacy</h2>
+        
+        <div class="info-card">
+          <h3 class="info-title">🔒 Privacy</h3>
+          <ul class="info-list">
+            <li>Your API key is stored locally in your browser</li>
+            <li>Text you explain is sent only to Google's Gemini API</li>
+            <li>No data is collected by this extension</li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <h3 class="info-title">⚡ Performance</h3>
+          <ul class="info-list">
+            <li>Text is limited to 8,000 characters for speed</li>
+            <li>Rate limited to 1 request per 2 seconds</li>
+            <li>Flash models provide faster responses</li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <h3 class="info-title">🎯 Usage Tips</h3>
+          <ul class="info-list">
+            <li>Use <kbd>Ctrl+Shift+E</kbd> (or <kbd>Cmd+Shift+E</kbd>) for quick explanations</li>
+            <li>Right-click selected text for context menu access</li>
+            <li>Adjust safety settings if responses are being blocked</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="actions">
+        <button type="button" id="resetBtn" class="secondary-btn">Reset to Defaults</button>
+        <button type="button" id="saveBtn" class="primary-btn">Save Settings</button>
+      </div>
+      <div class="status" id="status"></div>
+    </footer>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

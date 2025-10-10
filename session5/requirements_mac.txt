@@ -1,0 +1,21 @@
+# macOS Preview automation requirements
+# Core automation packages
+pyobjc
+pyautogui
+osascript
+
+# PDF generation
+reportlab
+
+# Image processing (already in your project)
+pillow
+
+# System utilities
+psutil
+
+# Alternative automation options (optional)
+pynput
+atomacos
+# MCP server dependencies (already in your project)
+# mcp
+# fastmcp

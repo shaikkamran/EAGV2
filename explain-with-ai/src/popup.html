@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explain with Gemini</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="title">
+        <img src="../assets/icon16.png" alt="AI" class="icon">
+        ExplainWithAi
+      </h1>
+    </header>
+
+    <main class="main">
+      <!-- Input Section -->
+      <section class="input-section">
+        <label for="textInput" class="label">Text to explain:</label>
+        <textarea 
+          id="textInput" 
+          class="text-input" 
+          placeholder="Select text on the page or paste text here..."
+          rows="4"
+        ></textarea>
+        <div class="char-count" id="charCount">0 / 8,000 characters</div>
+      </section>
+
+      <!-- Controls Section -->
+      <section class="controls-section">
+        <div class="control-group">
+          <label for="presetSelect" class="label">Style:</label>
+          <select id="presetSelect" class="select">
+            <option value="Plain">Plain explanation</option>
+            <option value="ELI5">Explain like I'm 5</option>
+            <option value="Key points">Key points</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="modelSelect" class="label">Model:</label>
+          <select id="modelSelect" class="select">
+            <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+            <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+            <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="safetySelect" class="label">Safety:</label>
+          <select id="safetySelect" class="select">
+            <option value="BLOCK_MEDIUM_AND_ABOVE">Default</option>
+            <option value="BLOCK_ONLY_HIGH">Relaxed</option>
+            <option value="BLOCK_NONE">Off</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- Action Section -->
+      <section class="action-section">
+        <button id="explainBtn" class="explain-btn" type="button">
+          <span class="btn-text">Explain</span>
+          <div class="spinner" id="spinner"></div>
+        </button>
+      </section>
+
+      <!-- Error Section -->
+      <section class="error-section" id="errorSection" style="display: none;">
+        <div class="error-message" id="errorMessage"></div>
+        <div class="error-hint" id="errorHint"></div>
+      </section>
+
+      <!-- Output Section -->
+      <section class="output-section" id="outputSection" style="display: none;">
+        <div class="output-header">
+          <label class="label">Explanation:</label>
+          <div class="output-actions">
+            <button id="copyBtn" class="action-btn" title="Copy to clipboard">
+              📋 Copy
+            </button>
+            <button id="rerunBtn" class="action-btn" title="Generate again">
+              🔄 Re-run
+            </button>
+          </div>
+        </div>
+        <div class="output-text" id="outputText"></div>
+        <div class="usage-info" id="usageInfo"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <a href="options.html" target="_blank" class="options-link">Settings</a>
+      <span class="divider">•</span>
+      <a href="https://ai.google.dev" target="_blank" class="help-link">Get Gemini API Key</a>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
