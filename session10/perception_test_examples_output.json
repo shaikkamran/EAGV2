@@ -1,0 +1,174 @@
+[
+    {
+        "example": "Initial State - Simple Query",
+        "context": {
+            "current_state": "User has just submitted a query. No actions have been taken yet.",
+            "original_user_query": "What is the capital of France?",
+            "plan_from_decision_agent": "No plan yet - initial query state",
+            "current_step_index": "N/A - Initial state",
+            "result_of_current_step": "No result yet - initial query state"
+        },
+        "final_prompt": {
+            "system_prompt": "\nYou are a Perception Agent, Specialised at Understanding different States of a Multi Agent System Loop.\n\n1. Initial State:\n    When the User Inputs a Query, with no other relevant inputs from Decision Agent\n    Inputs :\n        - Current State\n        - Original User Query\n\n2. Intermediary State:\n    Decision Agent Provides a Plan of Actions, which is a bunch of Steps.\n    You determine whether the Current Step's Objective Has been achieved.\n\n    If yes you move to the next subsequent Step.\n    Else You alalyse the Pending Objective of the current Step and Nudge the Decision Agent \n    to move in the right direction.\n\n    If the current Step happens to be the last step of the plan and the result is coherent with the User's \n    Original Query, then you mark the original Goal as achieved\n\n    Inputs :\n        - Current State\n        - Original User Query\n        - Plan from the Decision Agent\n        - Current Step Index (Index starts from 0 so Step 2 would indicate that 0 and 1 were already accomplished)\n        - Result of the Current Step\n\nOutput has to be provided in a Strict Structured JSON Format that is ERORLL\n\n```json\n{\n    \n  \"entities\": [\"...\"],             // A list of concrete items, terms, or values identified (e.g., [\"Sedan\", \"Tesla\", \"$80k\"])\n  \"result_requirement\": \"...\",     // A short phrase or sentence stating what kind of answer the user likely expects (e.g., \"List of unit configurations with pricing\")\n  \"original_goal_achieved\": false, // true if this single step completely answers the original query; false if more steps are needed\n  \"confidence\": \"...\"              // A Value between 0 and 1.0 showcasing your confidence on whether the agent is closer to solving user query.  \n  \"reasoning\": \"...\",              // A global explanation: Does this result move the agent closer to solving the user query? Why or why not?\n  \"local_goal_achieved\": false,    // true if this step *locally* succeeded (e.g., extracted useful data) and will help achieve final goal, even if the final goal isn't met yet\n  \"local_reasoning\": \"...\"         // A focused explanation of what this step contributed: was it a valid lookup, good chunk match, or meaningful transform or whether previous tool failed and why?\n  \"last_tooluse_summary: \"...\"     // ToolName and whether success or failure reason.\n  \"solution_summary\": \"...\"        // Your user friendly and readable summary of the solution only if \"original_goal_achieved\" is True, else \"Not ready yet\".\n}\n",
+            "formatted_user_prompt": "\nContext :\n\nInputs :\n\nCurrent State:\nUser has just submitted a query. No actions have been taken yet.\n\nOriginal User Query:\nWhat is the capital of France?\n\nPlan from the Decision Agent:\nNo plan yet - initial query state\n\nCurrent Step Index:\nN/A - Initial state\n\nResult of the Current Step from the Execution:\nNo result yet - initial query state\n\nReturn the result in the strict json output format as specified in the prompt."
+        },
+        "response": {
+            "entities": [
+                "France"
+            ],
+            "result_requirement": "The name of the capital city of France.",
+            "original_goal_achieved": false,
+            "confidence": "0.0",
+            "reasoning": "The agent is in the initial state and has not yet taken any actions to answer the user's question. The goal has not been achieved.",
+            "local_goal_achieved": false,
+            "local_reasoning": "No action has been taken yet, so no local goal has been achieved.",
+            "last_tooluse_summary": "N/A",
+            "solution_summary": "Not ready yet"
+        }
+    },
+    {
+        "example": "Initial State - Complex Query",
+        "context": {
+            "current_state": "User has just submitted a query. No actions have been taken yet.",
+            "original_user_query": "Find the number of BHK variants available in DLF Camelia from local sources and compare prices.",
+            "plan_from_decision_agent": "No plan yet - initial query state",
+            "current_step_index": "N/A - Initial state",
+            "result_of_current_step": "No result yet - initial query state"
+        },
+        "final_prompt": {
+            "system_prompt": "\nYou are a Perception Agent, Specialised at Understanding different States of a Multi Agent System Loop.\n\n1. Initial State:\n    When the User Inputs a Query, with no other relevant inputs from Decision Agent\n    Inputs :\n        - Current State\n        - Original User Query\n\n2. Intermediary State:\n    Decision Agent Provides a Plan of Actions, which is a bunch of Steps.\n    You determine whether the Current Step's Objective Has been achieved.\n\n    If yes you move to the next subsequent Step.\n    Else You alalyse the Pending Objective of the current Step and Nudge the Decision Agent \n    to move in the right direction.\n\n    If the current Step happens to be the last step of the plan and the result is coherent with the User's \n    Original Query, then you mark the original Goal as achieved\n\n    Inputs :\n        - Current State\n        - Original User Query\n        - Plan from the Decision Agent\n        - Current Step Index (Index starts from 0 so Step 2 would indicate that 0 and 1 were already accomplished)\n        - Result of the Current Step\n\nOutput has to be provided in a Strict Structured JSON Format that is ERORLL\n\n```json\n{\n    \n  \"entities\": [\"...\"],             // A list of concrete items, terms, or values identified (e.g., [\"Sedan\", \"Tesla\", \"$80k\"])\n  \"result_requirement\": \"...\",     // A short phrase or sentence stating what kind of answer the user likely expects (e.g., \"List of unit configurations with pricing\")\n  \"original_goal_achieved\": false, // true if this single step completely answers the original query; false if more steps are needed\n  \"confidence\": \"...\"              // A Value between 0 and 1.0 showcasing your confidence on whether the agent is closer to solving user query.  \n  \"reasoning\": \"...\",              // A global explanation: Does this result move the agent closer to solving the user query? Why or why not?\n  \"local_goal_achieved\": false,    // true if this step *locally* succeeded (e.g., extracted useful data) and will help achieve final goal, even if the final goal isn't met yet\n  \"local_reasoning\": \"...\"         // A focused explanation of what this step contributed: was it a valid lookup, good chunk match, or meaningful transform or whether previous tool failed and why?\n  \"last_tooluse_summary: \"...\"     // ToolName and whether success or failure reason.\n  \"solution_summary\": \"...\"        // Your user friendly and readable summary of the solution only if \"original_goal_achieved\" is True, else \"Not ready yet\".\n}\n",
+            "formatted_user_prompt": "\nContext :\n\nInputs :\n\nCurrent State:\nUser has just submitted a query. No actions have been taken yet.\n\nOriginal User Query:\nFind the number of BHK variants available in DLF Camelia from local sources and compare prices.\n\nPlan from the Decision Agent:\nNo plan yet - initial query state\n\nCurrent Step Index:\nN/A - Initial state\n\nResult of the Current Step from the Execution:\nNo result yet - initial query state\n\nReturn the result in the strict json output format as specified in the prompt."
+        },
+        "response": {
+            "entities": [
+                "DLF Camelia",
+                "BHK variants",
+                "local sources",
+                "prices"
+            ],
+            "result_requirement": "Number of BHK variants in DLF Camelia and a price comparison from local sources.",
+            "original_goal_achieved": false,
+            "confidence": "0.0",
+            "reasoning": "The agent is at the initial state and hasn't started executing any steps. Therefore, it is not closer to solving the user query.",
+            "local_goal_achieved": false,
+            "local_reasoning": "No step has been executed yet. No local goal achieved.",
+            "last_tooluse_summary": "N/A",
+            "solution_summary": "Not ready yet"
+        }
+    },
+    {
+        "example": "Intermediary State - Step 0 Success",
+        "context": {
+            "current_state": "Step 0 completed: Successfully searched local documents for DLF Camelia information.",
+            "original_user_query": "Find the number of BHK variants available in DLF Camelia from local sources.",
+            "plan_from_decision_agent": "Step 0: Search local documents for DLF Camelia\nStep 1: Extract BHK variant information\nStep 2: Format and present results",
+            "current_step_index": "0",
+            "result_of_current_step": "Found document: 'dlf.md' containing information about DLF Camelia project. Document mentions various unit configurations."
+        },
+        "final_prompt": {
+            "system_prompt": "\nYou are a Perception Agent, Specialised at Understanding different States of a Multi Agent System Loop.\n\n1. Initial State:\n    When the User Inputs a Query, with no other relevant inputs from Decision Agent\n    Inputs :\n        - Current State\n        - Original User Query\n\n2. Intermediary State:\n    Decision Agent Provides a Plan of Actions, which is a bunch of Steps.\n    You determine whether the Current Step's Objective Has been achieved.\n\n    If yes you move to the next subsequent Step.\n    Else You alalyse the Pending Objective of the current Step and Nudge the Decision Agent \n    to move in the right direction.\n\n    If the current Step happens to be the last step of the plan and the result is coherent with the User's \n    Original Query, then you mark the original Goal as achieved\n\n    Inputs :\n        - Current State\n        - Original User Query\n        - Plan from the Decision Agent\n        - Current Step Index (Index starts from 0 so Step 2 would indicate that 0 and 1 were already accomplished)\n        - Result of the Current Step\n\nOutput has to be provided in a Strict Structured JSON Format that is ERORLL\n\n```json\n{\n    \n  \"entities\": [\"...\"],             // A list of concrete items, terms, or values identified (e.g., [\"Sedan\", \"Tesla\", \"$80k\"])\n  \"result_requirement\": \"...\",     // A short phrase or sentence stating what kind of answer the user likely expects (e.g., \"List of unit configurations with pricing\")\n  \"original_goal_achieved\": false, // true if this single step completely answers the original query; false if more steps are needed\n  \"confidence\": \"...\"              // A Value between 0 and 1.0 showcasing your confidence on whether the agent is closer to solving user query.  \n  \"reasoning\": \"...\",              // A global explanation: Does this result move the agent closer to solving the user query? Why or why not?\n  \"local_goal_achieved\": false,    // true if this step *locally* succeeded (e.g., extracted useful data) and will help achieve final goal, even if the final goal isn't met yet\n  \"local_reasoning\": \"...\"         // A focused explanation of what this step contributed: was it a valid lookup, good chunk match, or meaningful transform or whether previous tool failed and why?\n  \"last_tooluse_summary: \"...\"     // ToolName and whether success or failure reason.\n  \"solution_summary\": \"...\"        // Your user friendly and readable summary of the solution only if \"original_goal_achieved\" is True, else \"Not ready yet\".\n}\n",
+            "formatted_user_prompt": "\nContext :\n\nInputs :\n\nCurrent State:\nStep 0 completed: Successfully searched local documents for DLF Camelia information.\n\nOriginal User Query:\nFind the number of BHK variants available in DLF Camelia from local sources.\n\nPlan from the Decision Agent:\nStep 0: Search local documents for DLF Camelia\nStep 1: Extract BHK variant information\nStep 2: Format and present results\n\nCurrent Step Index:\n0\n\nResult of the Current Step from the Execution:\nFound document: 'dlf.md' containing information about DLF Camelia project. Document mentions various unit configurations.\n\nReturn the result in the strict json output format as specified in the prompt."
+        },
+        "response": {
+            "entities": [
+                "DLF Camelia",
+                "BHK variants"
+            ],
+            "result_requirement": "The number of BHK variants available in DLF Camelia from local sources.",
+            "original_goal_achieved": false,
+            "confidence": "0.6",
+            "reasoning": "This step is a necessary first step to gather information about DLF Camelia from local sources. It moves closer to solving the user query by providing a document that potentially contains the required information about BHK variants.",
+            "local_goal_achieved": true,
+            "local_reasoning": "The step successfully found a local document containing information about the DLF Camelia project, indicating that the search was successful and relevant information might be present in the document.",
+            "last_tooluse_summary": "Search local documents - Success",
+            "solution_summary": "Not ready yet"
+        }
+    },
+    {
+        "example": "Intermediary State - Goal Achieved",
+        "context": {
+            "current_state": "Step 1 completed: Extracted BHK variant information from document.",
+            "original_user_query": "Find the number of BHK variants available in DLF Camelia from local sources.",
+            "plan_from_decision_agent": "Step 0: Search local documents for DLF Camelia\nStep 1: Extract BHK variant information",
+            "current_step_index": "1",
+            "result_of_current_step": "Extracted BHK variants: 2 BHK, 3 BHK, 4 BHK, 5 BHK. Total: 4 variants available in DLF Camelia."
+        },
+        "final_prompt": {
+            "system_prompt": "\nYou are a Perception Agent, Specialised at Understanding different States of a Multi Agent System Loop.\n\n1. Initial State:\n    When the User Inputs a Query, with no other relevant inputs from Decision Agent\n    Inputs :\n        - Current State\n        - Original User Query\n\n2. Intermediary State:\n    Decision Agent Provides a Plan of Actions, which is a bunch of Steps.\n    You determine whether the Current Step's Objective Has been achieved.\n\n    If yes you move to the next subsequent Step.\n    Else You alalyse the Pending Objective of the current Step and Nudge the Decision Agent \n    to move in the right direction.\n\n    If the current Step happens to be the last step of the plan and the result is coherent with the User's \n    Original Query, then you mark the original Goal as achieved\n\n    Inputs :\n        - Current State\n        - Original User Query\n        - Plan from the Decision Agent\n        - Current Step Index (Index starts from 0 so Step 2 would indicate that 0 and 1 were already accomplished)\n        - Result of the Current Step\n\nOutput has to be provided in a Strict Structured JSON Format that is ERORLL\n\n```json\n{\n    \n  \"entities\": [\"...\"],             // A list of concrete items, terms, or values identified (e.g., [\"Sedan\", \"Tesla\", \"$80k\"])\n  \"result_requirement\": \"...\",     // A short phrase or sentence stating what kind of answer the user likely expects (e.g., \"List of unit configurations with pricing\")\n  \"original_goal_achieved\": false, // true if this single step completely answers the original query; false if more steps are needed\n  \"confidence\": \"...\"              // A Value between 0 and 1.0 showcasing your confidence on whether the agent is closer to solving user query.  \n  \"reasoning\": \"...\",              // A global explanation: Does this result move the agent closer to solving the user query? Why or why not?\n  \"local_goal_achieved\": false,    // true if this step *locally* succeeded (e.g., extracted useful data) and will help achieve final goal, even if the final goal isn't met yet\n  \"local_reasoning\": \"...\"         // A focused explanation of what this step contributed: was it a valid lookup, good chunk match, or meaningful transform or whether previous tool failed and why?\n  \"last_tooluse_summary: \"...\"     // ToolName and whether success or failure reason.\n  \"solution_summary\": \"...\"        // Your user friendly and readable summary of the solution only if \"original_goal_achieved\" is True, else \"Not ready yet\".\n}\n",
+            "formatted_user_prompt": "\nContext :\n\nInputs :\n\nCurrent State:\nStep 1 completed: Extracted BHK variant information from document.\n\nOriginal User Query:\nFind the number of BHK variants available in DLF Camelia from local sources.\n\nPlan from the Decision Agent:\nStep 0: Search local documents for DLF Camelia\nStep 1: Extract BHK variant information\n\nCurrent Step Index:\n1\n\nResult of the Current Step from the Execution:\nExtracted BHK variants: 2 BHK, 3 BHK, 4 BHK, 5 BHK. Total: 4 variants available in DLF Camelia.\n\nReturn the result in the strict json output format as specified in the prompt."
+        },
+        "response": {
+            "entities": [
+                "2 BHK",
+                "3 BHK",
+                "4 BHK",
+                "5 BHK",
+                "DLF Camelia",
+                "4 variants"
+            ],
+            "result_requirement": "The number of BHK variants available in DLF Camelia.",
+            "original_goal_achieved": true,
+            "confidence": "1.0",
+            "reasoning": "The current step successfully extracted the BHK variant information and the total number of variants from the local source, which directly answers the user's original query. The plan has been completed and the result is coherent.",
+            "local_goal_achieved": true,
+            "local_reasoning": "The current step's objective of extracting BHK variant information was successfully achieved. The extracted information directly contributes to answering the user's original query.",
+            "last_tooluse_summary": "Extraction tool success - identified BHK variants and their total count.",
+            "solution_summary": "There are 4 BHK variants available in DLF Camelia: 2 BHK, 3 BHK, 4 BHK, and 5 BHK."
+        }
+    },
+    {
+        "example": "Intermediary State - Step Failed",
+        "context": {
+            "current_state": "Step 0 failed: Document search returned no results.",
+            "original_user_query": "Find pricing information for Tesla Model 3.",
+            "plan_from_decision_agent": "Step 0: Search local documents for Tesla Model 3\nStep 1: Extract pricing information",
+            "current_step_index": "0",
+            "result_of_current_step": "Error: No documents found matching 'Tesla Model 3'. Search tool returned empty result."
+        },
+        "final_prompt": {
+            "system_prompt": "\nYou are a Perception Agent, Specialised at Understanding different States of a Multi Agent System Loop.\n\n1. Initial State:\n    When the User Inputs a Query, with no other relevant inputs from Decision Agent\n    Inputs :\n        - Current State\n        - Original User Query\n\n2. Intermediary State:\n    Decision Agent Provides a Plan of Actions, which is a bunch of Steps.\n    You determine whether the Current Step's Objective Has been achieved.\n\n    If yes you move to the next subsequent Step.\n    Else You alalyse the Pending Objective of the current Step and Nudge the Decision Agent \n    to move in the right direction.\n\n    If the current Step happens to be the last step of the plan and the result is coherent with the User's \n    Original Query, then you mark the original Goal as achieved\n\n    Inputs :\n        - Current State\n        - Original User Query\n        - Plan from the Decision Agent\n        - Current Step Index (Index starts from 0 so Step 2 would indicate that 0 and 1 were already accomplished)\n        - Result of the Current Step\n\nOutput has to be provided in a Strict Structured JSON Format that is ERORLL\n\n```json\n{\n    \n  \"entities\": [\"...\"],             // A list of concrete items, terms, or values identified (e.g., [\"Sedan\", \"Tesla\", \"$80k\"])\n  \"result_requirement\": \"...\",     // A short phrase or sentence stating what kind of answer the user likely expects (e.g., \"List of unit configurations with pricing\")\n  \"original_goal_achieved\": false, // true if this single step completely answers the original query; false if more steps are needed\n  \"confidence\": \"...\"              // A Value between 0 and 1.0 showcasing your confidence on whether the agent is closer to solving user query.  \n  \"reasoning\": \"...\",              // A global explanation: Does this result move the agent closer to solving the user query? Why or why not?\n  \"local_goal_achieved\": false,    // true if this step *locally* succeeded (e.g., extracted useful data) and will help achieve final goal, even if the final goal isn't met yet\n  \"local_reasoning\": \"...\"         // A focused explanation of what this step contributed: was it a valid lookup, good chunk match, or meaningful transform or whether previous tool failed and why?\n  \"last_tooluse_summary: \"...\"     // ToolName and whether success or failure reason.\n  \"solution_summary\": \"...\"        // Your user friendly and readable summary of the solution only if \"original_goal_achieved\" is True, else \"Not ready yet\".\n}\n",
+            "formatted_user_prompt": "\nContext :\n\nInputs :\n\nCurrent State:\nStep 0 failed: Document search returned no results.\n\nOriginal User Query:\nFind pricing information for Tesla Model 3.\n\nPlan from the Decision Agent:\nStep 0: Search local documents for Tesla Model 3\nStep 1: Extract pricing information\n\nCurrent Step Index:\n0\n\nResult of the Current Step from the Execution:\nError: No documents found matching 'Tesla Model 3'. Search tool returned empty result.\n\nReturn the result in the strict json output format as specified in the prompt."
+        },
+        "response": {
+            "entities": [
+                "Tesla Model 3"
+            ],
+            "result_requirement": "Pricing information for Tesla Model 3",
+            "original_goal_achieved": false,
+            "confidence": "0.1",
+            "reasoning": "The initial step failed, indicating that the agent is not closer to solving the user query. The search for local documents yielded no results, which means the subsequent step of extracting pricing information cannot be performed.",
+            "local_goal_achieved": false,
+            "local_reasoning": "The local goal of finding relevant documents was not achieved. The search query 'Tesla Model 3' returned no matching documents. This indicates that the documents might be named differently or are not available locally.",
+            "last_tooluse_summary": "Search tool failed: No documents found matching the query.",
+            "solution_summary": "Not ready yet"
+        }
+    },
+    {
+        "example": "Intermediary State - Partial Success",
+        "context": {
+            "current_state": "Step 0 completed: Found document with basic information.",
+            "original_user_query": "Get detailed specifications and pricing for all Tesla models.",
+            "plan_from_decision_agent": "Step 0: Search for Tesla documents\nStep 1: Extract model names\nStep 2: Get specifications for each model\nStep 3: Get pricing for each model\nStep 4: Format comprehensive report",
+            "current_step_index": "0",
+            "result_of_current_step": "Found document 'Tesla_Motors_IP_Open_Innovation_and_the_Carbon_Crisis.pdf'. Document mentions Tesla models but does not contain detailed specifications or pricing."
+        },
+        "final_prompt": {
+            "system_prompt": "\nYou are a Perception Agent, Specialised at Understanding different States of a Multi Agent System Loop.\n\n1. Initial State:\n    When the User Inputs a Query, with no other relevant inputs from Decision Agent\n    Inputs :\n        - Current State\n        - Original User Query\n\n2. Intermediary State:\n    Decision Agent Provides a Plan of Actions, which is a bunch of Steps.\n    You determine whether the Current Step's Objective Has been achieved.\n\n    If yes you move to the next subsequent Step.\n    Else You alalyse the Pending Objective of the current Step and Nudge the Decision Agent \n    to move in the right direction.\n\n    If the current Step happens to be the last step of the plan and the result is coherent with the User's \n    Original Query, then you mark the original Goal as achieved\n\n    Inputs :\n        - Current State\n        - Original User Query\n        - Plan from the Decision Agent\n        - Current Step Index (Index starts from 0 so Step 2 would indicate that 0 and 1 were already accomplished)\n        - Result of the Current Step\n\nOutput has to be provided in a Strict Structured JSON Format that is ERORLL\n\n```json\n{\n    \n  \"entities\": [\"...\"],             // A list of concrete items, terms, or values identified (e.g., [\"Sedan\", \"Tesla\", \"$80k\"])\n  \"result_requirement\": \"...\",     // A short phrase or sentence stating what kind of answer the user likely expects (e.g., \"List of unit configurations with pricing\")\n  \"original_goal_achieved\": false, // true if this single step completely answers the original query; false if more steps are needed\n  \"confidence\": \"...\"              // A Value between 0 and 1.0 showcasing your confidence on whether the agent is closer to solving user query.  \n  \"reasoning\": \"...\",              // A global explanation: Does this result move the agent closer to solving the user query? Why or why not?\n  \"local_goal_achieved\": false,    // true if this step *locally* succeeded (e.g., extracted useful data) and will help achieve final goal, even if the final goal isn't met yet\n  \"local_reasoning\": \"...\"         // A focused explanation of what this step contributed: was it a valid lookup, good chunk match, or meaningful transform or whether previous tool failed and why?\n  \"last_tooluse_summary: \"...\"     // ToolName and whether success or failure reason.\n  \"solution_summary\": \"...\"        // Your user friendly and readable summary of the solution only if \"original_goal_achieved\" is True, else \"Not ready yet\".\n}\n",
+            "formatted_user_prompt": "\nContext :\n\nInputs :\n\nCurrent State:\nStep 0 completed: Found document with basic information.\n\nOriginal User Query:\nGet detailed specifications and pricing for all Tesla models.\n\nPlan from the Decision Agent:\nStep 0: Search for Tesla documents\nStep 1: Extract model names\nStep 2: Get specifications for each model\nStep 3: Get pricing for each model\nStep 4: Format comprehensive report\n\nCurrent Step Index:\n0\n\nResult of the Current Step from the Execution:\nFound document 'Tesla_Motors_IP_Open_Innovation_and_the_Carbon_Crisis.pdf'. Document mentions Tesla models but does not contain detailed specifications or pricing.\n\nReturn the result in the strict json output format as specified in the prompt."
+        },
+        "response": {
+            "entities": [
+                "Tesla",
+                "Tesla models"
+            ],
+            "result_requirement": "Detailed specifications and pricing for all Tesla models",
+            "original_goal_achieved": false,
+            "confidence": "0.3",
+            "reasoning": "The document found mentions Tesla models, which is a small step in the right direction, but it doesn't contain the detailed specifications or pricing required to fulfill the user's query. Therefore, the original goal is not achieved, but this step provides a basic starting point.",
+            "local_goal_achieved": true,
+            "local_reasoning": "The tool successfully located a document related to Tesla. However, the document itself did not contain the required information. The step was successful in that it produced *a* result, even if not the *right* result. We can now guide the next step based on the information the document contained and what it lacked.",
+            "last_tooluse_summary": "Search tool successful, document found but lacks required information.",
+            "solution_summary": "Not ready yet"
+        }
+    }
+]

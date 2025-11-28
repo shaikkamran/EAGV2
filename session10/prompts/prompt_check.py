@@ -3,6 +3,36 @@ import os
 from dotenv import load_dotenv
 
 
+  # Context:
+
+  # Plan Mode:
+  # {{plan_mode}}
+
+  # Planning Strategy:
+  # {{planning_strategy}}
+
+  # Original User Query:
+  # {{original_user_query}}
+
+  # Latest Perception Object (ERORLL):
+  # {{perception_object}}
+
+  # Current Plan Text:
+  # {{current_plan_text}}
+
+  # Completed Steps (if any):
+  # {{completed_steps}}
+
+  # Most Recent Step Feedback:
+  # {{recent_step_feedback}}
+
+  # Available Tools:
+  # {{available_tools}}
+
+  # Provide `plan_text` and the next JSON step exactly as described in the system prompt.
+
+
+
 decision_1 = """
 {
   "plan_mode": "initial",

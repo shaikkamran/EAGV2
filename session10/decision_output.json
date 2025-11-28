@@ -1,0 +1,13 @@
+{
+    "plan_text": [
+        "Step 0: Search local documents for the number of BHK variants in DLF Camelia.",
+        "Step 1: Search the web for the number of BHK variants in DLF Camelia.",
+        "Step 2: Compare the results from local and web sources and provide the number of BHK variants available."
+    ],
+    "next_step": {
+        "step_index": 0,
+        "description": "Search local documents for the number of BHK variants in DLF Camelia.",
+        "type": "CODE",
+        "code": "async def solve():\n    variants = search_local_documents_rag(\"DLF Camelia BHK variants\")\n    return {\"variants\": variants}\n\nresult = await solve()\nreturn result"
+    }
+}
